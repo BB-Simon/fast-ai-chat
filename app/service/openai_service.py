@@ -4,9 +4,12 @@ from app.core.config import OPENAI_API_KEY
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 async def generate_reply(messages):
-  response = client.chat.completions.create(
+  streem = client.chat.completions.create(
     model="gpt-4.1-mini",
-    messages=messages
+    messages=messages,
+    stream=True
   )
 
-  return response.choices[0].message.content
+  for chunk in streem:
+    if chunk.choices[0].delta.content:
+      yield chunk.choices[0].delta.content

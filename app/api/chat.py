@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from app.schemas.chat_schema import ChatRequest
 from app.service.openai_service import generate_reply
@@ -36,9 +37,14 @@ async def chat(chat_id: int, req: ChatRequest, db: Session = Depends(get_db)):
     ]
 
     # Get AI reply
-    reply = await generate_reply(formatedContent)
+    async def generator():
+        full_reply = ""
 
-    # Save assistant reply
-    save_message(db, chat_id, 'assistant', reply)
+        async for chunk in generate_reply(formatedContent):
+            full_reply += chunk
+            yield chunk
 
-    return {'reply': reply}
+        # Save assistant reply
+        save_message(db, chat_id, 'assistant', full_reply)
+
+    return StreamingResponse(generator(), media_type="text/plain")
