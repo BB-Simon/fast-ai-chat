@@ -3,12 +3,10 @@ from app.core.config import OPENAI_API_KEY
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-async def generate_reply(message: str):
+async def generate_reply(messages):
   response = client.chat.completions.create(
     model="gpt-4.1-mini",
-    messages=[
-      {"role": "user", "content": message}
-    ]
+    messages=messages
   )
 
   return response.choices[0].message.content
