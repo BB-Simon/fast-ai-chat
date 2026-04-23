@@ -15,3 +15,11 @@ class Message(Base):
   chat_id =  Column(Integer, ForeignKey("chats.id"))
   role = Column(String) # user | assistant
   content = Column(Text)
+
+class Document(Base):
+  
+  __tablename__ = "documents"
+
+  id = Column(Integer, primary_key=True, index=True)
+  filename = Column(String)
+  content = Column(Text)

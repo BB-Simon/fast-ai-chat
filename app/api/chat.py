@@ -4,6 +4,9 @@ from sqlalchemy.orm import Session
 from app.schemas.chat_schema import ChatRequest
 from app.service.openai_service import generate_reply
 from app.db.deps import get_db
+from app.repositories.document_repository import get_document
+from app.service.rag_service import build_prompt
+
 from app.repositories.chat_repositories import (
     get_messages,
     save_message,
@@ -48,3 +51,19 @@ async def chat(chat_id: int, req: ChatRequest, db: Session = Depends(get_db)):
         save_message(db, chat_id, 'assistant', full_reply)
 
     return StreamingResponse(generator(), media_type="text/plain")
+
+
+@router.post("/ask/{doc_id}")
+async def ask_doc(doc_id: int, req: ChatRequest, db: Session = Depends(get_db)):
+    doc = get_document(db, doc_id)
+
+    if not doc:
+        return {"error": "Document not found!"}
+    
+    prompt = build_prompt(req.message, doc.content)
+
+    reply = generate_reply([
+        {"role": "user", "content": prompt}
+    ])
+
+    return {"Answer": reply}
