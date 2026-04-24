@@ -23,3 +23,12 @@ class Document(Base):
   id = Column(Integer, primary_key=True, index=True)
   filename = Column(String)
   content = Column(Text)
+
+class DocumentChunk(Base):
+
+  __tablename__ = "document_chunks"
+  
+  id = Column(Integer, primary_key=True, index=True)
+  document_id = Column(Integer, ForeignKey("documents.id"))
+  content = Column(Text)
+  embedding = Column(Text)

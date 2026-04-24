@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from app.schemas.chat_schema import ChatRequest
 from app.service.openai_service import generate_reply
 from app.db.deps import get_db
-from app.repositories.document_repository import get_document
-from app.service.rag_service import build_prompt
+from app.repositories.document_repository import get_document, get_chunks
+from app.service.rag_service import build_prompt, get_relevant_chunks
 
 from app.repositories.chat_repositories import (
     get_messages,
@@ -55,15 +55,37 @@ async def chat(chat_id: int, req: ChatRequest, db: Session = Depends(get_db)):
 
 @router.post("/ask/{doc_id}")
 async def ask_doc(doc_id: int, req: ChatRequest, db: Session = Depends(get_db)):
-    doc = get_document(db, doc_id)
+    chunks = get_chunks(db, doc_id)
 
-    if not doc:
-        return {"error": "Document not found!"}
-    
-    prompt = build_prompt(req.message, doc.content)
+    relevant_chunks = get_relevant_chunks(req.message, chunks)
+    context = "\n\n".join(relevant_chunks)
+    prompt = f"""
+Use the context below to answer:
 
-    reply = generate_reply([
+{context}
+
+Question: {req.message}
+    """
+
+    reply = await generate_reply([
         {"role": "user", "content": prompt}
     ])
 
     return {"Answer": reply}
+
+
+
+# @router.post("/ask/{doc_id}")
+# async def ask_doc(doc_id: int, req: ChatRequest, db: Session = Depends(get_db)):
+#     doc = get_document(db, doc_id)
+
+#     if not doc:
+#         return {"error": "Document not found!"}
+    
+#     prompt = build_prompt(req.message, doc.content)
+
+#     reply = generate_reply([
+#         {"role": "user", "content": prompt}
+#     ])
+
+#     return {"Answer": reply}
