@@ -6,6 +6,7 @@ from app.service.openai_service import generate_reply
 from app.db.deps import get_db
 from app.repositories.document_repository import get_document, get_chunks
 from app.service.rag_service import build_prompt, get_relevant_chunks
+from app.db.deps import get_current_user
 
 from app.repositories.chat_repositories import (
     get_messages,
@@ -21,8 +22,8 @@ def health():
     return {"status": "ok"}
 
 @router.post("/chat")
-def new_chat(db: Session = Depends(get_db)):
-    chat = create_chat(db)
+def new_chat(db: Session = Depends(get_db), user_id: int = Depends(get_current_user)):
+    chat = create_chat(db,user_id=user_id )
     return {"chat_id": chat.id}
 
 @router.post('/chat/{chat_id}')

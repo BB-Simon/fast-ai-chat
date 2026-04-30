@@ -1,4 +1,11 @@
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBearer
+from jose import jwt
 from app.db.database import session_local
+
+from app.core.security import SECRET_KET, ALGHORITHM
+
+security = HTTPBearer()
 
 def get_db():
   db = session_local()
@@ -6,3 +13,11 @@ def get_db():
     yield db
   finally:
     db.close()
+
+
+def get_current_user(token=Depends(security)):
+  try:
+    payload = jwt.decode(token.credentials, SECRET_KET, ALGHORITHM)
+    return payload['user_id']
+  except:
+    raise HTTPException(status_code=401, detail="Invalid credentials")

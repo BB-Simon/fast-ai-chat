@@ -1,7 +1,7 @@
 from app.db.models import Chat, Message
 
-def create_chat(db):
-  chat = Chat(title = "New chat")
+def create_chat(db, user_id):
+  chat = Chat(title="New chat", user_id=user_id)
   db.add(chat)
   db.commit()
   db.refresh(chat)

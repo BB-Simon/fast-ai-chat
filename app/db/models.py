@@ -6,6 +6,7 @@ class Chat(Base):
   __tablename__ = "chats"
   id = Column(Integer, primary_key=True, index=True)
   title = Column(String)
+  user_id = Column(String) # Link to user
 
 class Message(Base):
 
@@ -32,3 +33,10 @@ class DocumentChunk(Base):
   document_id = Column(Integer, ForeignKey("documents.id"))
   content = Column(Text)
   embedding = Column(Text)
+
+
+class User(Base):
+  __tablename__ = "users"
+  id = Column(Integer, primary_key=True, index=True)
+  email = Column(String, unique=True, index=True)
+  password = Column(String)
