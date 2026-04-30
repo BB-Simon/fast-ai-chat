@@ -21,3 +21,10 @@ def get_current_user(token=Depends(security)):
     return payload['user_id']
   except:
     raise HTTPException(status_code=401, detail="Invalid credentials")
+  
+
+def require_admin(user=Depends(get_current_user)):
+  if user.get("user").role != "admin":
+    raise HTTPException(status_code=403, detail="Admin only")
+  
+  return user

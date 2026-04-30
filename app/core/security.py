@@ -16,7 +16,15 @@ def verify_password(plain, hash):
 
 def create_token(data: dict):
   to_encode = data.copy()
-  expire = datetime.now(datetime.timezone.utc) + timedelta(days=1)
+  expire = datetime.now(datetime.timezone.utc) + timedelta(minutes=15)
   to_encode.update({"exp": expire})
 
   return jwt.encode(to_encode, SECRET_KET, ALGHORITHM)
+
+
+def create_refresh_token(data: dict):
+  to_encode = data.copy()
+  expire = datetime.utcnow() + timedelta(days=7)
+
+  to_encode.update({"exp": expire})
+  return jwt.encode(to_encode, SECRET_KET, algorithm=ALGHORITHM)
