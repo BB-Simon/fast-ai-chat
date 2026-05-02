@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from app.schemas.chat_schema import ChatRequest
@@ -8,6 +8,7 @@ from app.repositories.document_repository import get_document, get_chunks
 from app.service.rag_service import build_prompt, get_relevant_chunks
 from app.db.deps import get_current_user
 from app.repositories.usage_repository import add_usage
+from app.core.rate_limit import check_rate_limit
 
 from app.repositories.chat_repositories import (
     get_messages,
@@ -29,6 +30,12 @@ def new_chat(db: Session = Depends(get_db), user_id: int = Depends(get_current_u
 
 @router.post('/chat/{chat_id}')
 async def chat(chat_id: int, req: ChatRequest, db: Session = Depends(get_db)):
+    
+    # TODO: Need to have user id
+    # if not check_rate_limit(user_id=chat.user.id):
+    #     raise HTTPException(status_code=429, detail="Rate limit exceeded")
+    
+    
     # Save user message
     save_message(db, chat_id, "user", req.message)
 
