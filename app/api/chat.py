@@ -7,6 +7,7 @@ from app.db.deps import get_db
 from app.repositories.document_repository import get_document, get_chunks
 from app.service.rag_service import build_prompt, get_relevant_chunks
 from app.db.deps import get_current_user
+from app.repositories.usage_repository import add_usage
 
 from app.repositories.chat_repositories import (
     get_messages,
@@ -50,6 +51,9 @@ async def chat(chat_id: int, req: ChatRequest, db: Session = Depends(get_db)):
 
         # Save assistant reply
         save_message(db, chat_id, 'assistant', full_reply)
+        # Save used token
+        # TODO: need to get chat by chat id, chat has user_id
+        # add_usage(db, user_id=chat.user_id, tokens=len(full_reply))
 
     return StreamingResponse(generator(), media_type="text/plain")
 

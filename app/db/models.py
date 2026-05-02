@@ -41,3 +41,12 @@ class User(Base):
   email = Column(String, unique=True, index=True)
   password = Column(String)
   role = Column(String, default="user")
+
+
+class Usage(Base):
+  __tablename__ = "usages"
+
+  id = Column(Integer, primary_key=True, index=True)
+  user_id = Column(Integer, ForeignKey("users.id"))
+  token_used = Column(Integer, default=0)
+  
