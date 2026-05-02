@@ -31,10 +31,9 @@ def new_chat(db: Session = Depends(get_db), user_id: int = Depends(get_current_u
 @router.post('/chat/{chat_id}')
 async def chat(chat_id: int, req: ChatRequest, db: Session = Depends(get_db)):
     
-    # TODO: Need to have user id
-    # if not check_rate_limit(user_id=chat.user.id):
+    # TODO: Need to have user id, user's plan
+    # if not check_rate_limit(user_id=chat.user.id, chat.user.plan):
     #     raise HTTPException(status_code=429, detail="Rate limit exceeded")
-    
     
     # Save user message
     save_message(db, chat_id, "user", req.message)
