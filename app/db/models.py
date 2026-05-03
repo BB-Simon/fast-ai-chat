@@ -41,6 +41,7 @@ class User(Base):
   email = Column(String, unique=True, index=True)
   password = Column(String)
   role = Column(String, default="user")
+  stripe_customer_id = Column(String)
 
 
 class Usage(Base):
