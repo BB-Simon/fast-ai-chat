@@ -50,3 +50,18 @@ class Usage(Base):
   user_id = Column(Integer, ForeignKey("users.id"))
   token_used = Column(Integer, default=0)
   
+
+class Subscription(Base):
+  __tablename__ = "subscriptions"
+
+  id = Column(Integer, primary_key=True, index=True)
+  user_id = Column(Integer)
+  plan = Column(String) # free/pro
+
+
+class Event(Base):
+  __tablename__ = "events"
+
+  id = Column(Integer, primary_key=True, index=True)
+  user_id = Column(Integer)
+  event_type = Column(String)
