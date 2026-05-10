@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
 from app.db.database import Base
 
 class Chat(Base):
@@ -6,7 +6,7 @@ class Chat(Base):
   __tablename__ = "chats"
   id = Column(Integer, primary_key=True, index=True)
   title = Column(String)
-  user_id = Column(String) # Link to user
+  user_id = Column(Integer, ForeignKey("user.id")) # Link to user
 
 class Message(Base):
 
@@ -40,8 +40,14 @@ class User(Base):
   id = Column(Integer, primary_key=True, index=True)
   email = Column(String, unique=True, index=True)
   password = Column(String)
-  role = Column(String, default="user")
-  stripe_customer_id = Column(String)
+
+  role = Column(String, default="user") # user/admin
+  plan = Column(String, default="free") # free/pro
+
+  stripe_customer_id = Column(String, nullable=True)
+  stripe_subscription_id = Column(String, nullable=True)
+
+  payment_failed_At = Column(DateTime, nullable=True)
 
 
 class Usage(Base):
@@ -49,15 +55,7 @@ class Usage(Base):
 
   id = Column(Integer, primary_key=True, index=True)
   user_id = Column(Integer, ForeignKey("users.id"))
-  token_used = Column(Integer, default=0)
-  
-
-class Subscription(Base):
-  __tablename__ = "subscriptions"
-
-  id = Column(Integer, primary_key=True, index=True)
-  user_id = Column(Integer)
-  plan = Column(String) # free/pro
+  tokens_used = Column(Integer, default=0)
 
 
 class Event(Base):

@@ -28,3 +28,7 @@ def require_admin(user=Depends(get_current_user)):
     raise HTTPException(status_code=403, detail="Admin only")
   
   return user
+
+def require_pro(user=Depends(get_current_user)):
+  if user.get("user").plan != "pro":
+    raise HTTPException(status_code=403, detail="Upgrade required!")
